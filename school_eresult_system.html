@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School E-Result System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    .login-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-box {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .app-container { min-height: 100vh; display: none; }
+    .app-container.active { display: block; }
+    .header {
+      background: #667eea;
+      color: white;
+      padding: 15px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tabs {
+      background: white;
+      border-bottom: 1px solid #ddd;
+      overflow-x: auto;
+    }
+    .tabs-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+    }
+    .tab {
+      padding: 14px 18px;
+      background: transparent;
+      color: #666;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: #667eea;
+      color: white;
+      font-weight: 600;
+    }
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-success { background: #4CAF50; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .grid { display: grid; gap: 15px; }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .input-group { margin-bottom: 15px; }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .subject-selector {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: white;
+    }
+    .subject-item {
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .subject-item:hover { background: #f0f0f0; }
+    .subject-item.selected {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+    .selected-subjects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .subject-tag {
+      background: #667eea;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .subject-tag .remove {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+    .hidden { display: none; }
+    .dob-selectors {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 8px;
+    }
+    .score-input {
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      width: 60px;
+    }
+    .rating-selector {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .rating-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .rating-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container" id="loginContainer">
+  <div class="login-box">
+    <h1 style="text-align: center; color: #333; margin-bottom: 10px;">📊 E-Result System</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">Academic Management</p>
+
+    <div class="input-group">
+      <label>Login Type</label>
+      <select id="userType">
+        <option value="">Select</option>
+        <option value="admin">Admin</option>
+        <option value="formmaster">Form Master</option>
+      </select>
+    </div>
+
+    <div id="adminFields" class="hidden">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="adminUsername" placeholder="admin">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="adminPassword" placeholder="admin123">
+      </div>
+    </div>
+
+    <div id="formmasterFields" class="hidden">
+      <div class="input-group">
+        <label>Class Arm</label>
+        <select id="selectedArm"></select>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="armPassword">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="loginBtn" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px;">Login</button>
+
+    <div id="loginError" class="hidden" style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; font-size: 13px; text-align: center;"></div>
+
+    <div style="background: #e3f2fd; padding: 12px; border-radius: 6px; font-size: 12px; color: #1565c0; margin-top: 15px;">
+      <strong>Demo:</strong> admin / admin123
+    </div>
+  </div>
+</div>
+
+<div class="app-container" id="appContainer">
+  <div class="header">
+    <div class="header-content">
+      <h1 style="font-size: 22px;">📊 E-Result System</h1>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <span id="currentUserName" style="font-size: 14px;"></span>
+        <button class="btn btn-danger" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tabs-content" id="tabsContainer"></div>
+  </div>
+
+  <div class="main-content">
+    <div id="dashboardTab" class="hidden"></div>
+    <div id="armsTab" class="hidden"></div>
+    <div id="mastersTab" class="hidden"></div>
+    <div id="schoolTab" class="hidden"></div>
+    <div id="assessmentTab" class="hidden"></div>
+    <div id="inputTab" class="hidden"></div>
+    <div id="computeTab" class="hidden"></div>
+    <div id="viewTab" class="hidden"></div>
+    <div id="printTab" class="hidden"></div>
+  </div>
+</div>
+
+<script>
+const allSubjects = ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology', 'Further Mathematics', 'Agricultural Science', 'Economics', 'Commerce', 'Accounting', 'Government', 'Geography', 'Literature in English', 'Christian Religious Studies', 'Islamic Religious Studies', 'History', 'Civic Education', 'Computer Studies', 'Information Technology', 'Data Processing', 'Technical Drawing', 'Basic Technology', 'Home Economics', 'Food and Nutrition', 'Clothing and Textiles', 'Visual Arts', 'Music', 'Physical and Health Education', 'French', 'Hausa', 'Igbo', 'Yoruba', 'Arabic'];
+
+const affectiveDomains = ['Punctuality', 'Attendance', 'Honesty', 'Neatness', 'Politeness', 'Relationship with Others', 'Self Control', 'Attentiveness'];
+
+const psychomotorDomains = ['Handwriting', 'Verbal Fluency', 'Games/Sports', 'Handling Tools', 'Drawing/Painting', 'Musical Skills'];
+
+let currentUser = null;
+let classArms = [];
+let formMasters = [];
+let students = [];
+let selectedSubjects = [];
+let subjectScores = {};
+let affectiveRatings = {};
+let psychomotorRatings = {};
+
+let schoolInfo = {
+  name: 'Divine Progressive College',
+  address: 'KM4 Along Gboko, Aliade Road, Luga, Gboko West',
+  email: 'school@email.com',
+  phone: '+234 812 345 6789',
+  session: '2024/2025',
+  principalName: 'Dr. Adebayo Okafor',
+  logo: '',
+  principalSignature: '',
+  principalComment: ''
+};
+
+let teacherSignatures = {};
+let assessmentConfig = {};
+
+function generateArms() {
+  const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+  const letters = ['A', 'B', 'C', 'D', 'E'];
+  let id = 1;
+  
+  classes.forEach(cls => {
+    letters.forEach(letter => {
+      const className = `${cls}${letter}`;
+      classArms.push({
+        id: id++,
+        name: className,
+        formMaster: '',
+        formMasterEmail: '',
+        password: cls.toLowerCase() + letter.toLowerCase(),
+        studentNames: Array(50).fill('')
+      });
+      
+      assessmentConfig[className] = { ca1: 10, ca2: 10, ca3: 10, exam: 70 };
+    });
+  });
+}
+
+generateArms();
+
+affectiveDomains.forEach(d => { affectiveRatings[d] = 5; });
+psychomotorDomains.forEach(d => { psychomotorRatings[d] = 5; });
+
+document.getElementById('userType').addEventListener('change', function(e) {
+  document.getElementById('adminFields').classList.toggle('hidden', e.target.value !== 'admin');
+  document.getElementById('formmasterFields').classList.toggle('hidden', e.target.value !== 'formmaster');
+  if (e.target.value === 'formmaster') updateArmDropdown();
+});
+
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
+document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+function updateArmDropdown() {
+  const select = document.getElementById('selectedArm');
+  select.innerHTML = '<option value="">Select</option>';
+  classArms.filter(a => a.formMaster).forEach(arm => {
+    const opt = document.createElement('option');
+    opt.value = arm.name;
+    opt.textContent = `${arm.name} - ${arm.formMaster}`;
+    select.appendChild(opt);
+  });
+}
+
+function handleLogin() {
+  const userType = document.getElementById('userType').value;
+  const errorDiv = document.getElementById('loginError');
+  errorDiv.classList.add('hidden');
+
+  if (userType === 'admin') {
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+    
+    if (username === 'admin' && password === 'admin123') {
+      currentUser = { type: 'admin', name: 'Administrator' };
+      showApp();
+    } else {
+      errorDiv.textContent = 'Invalid admin credentials';
+      errorDiv.classList.remove('hidden');
+    }
+  } else if (userType === 'formmaster') {
+    const armName = document.getElementById('selectedArm').value;
+    const password = document.getElementById('armPassword').value;
+    const arm = classArms.find(a => a.name === armName);
+    const fm = formMasters.find(f => f.name === arm?.formMaster && f.password === password);
+    
+    if (arm && fm) {
+      currentUser = { type: 'formmaster', name: arm.formMaster, arm: armName };
+      showApp();
+    } else {
+      errorDiv.textContent = 'Invalid arm or password';
+      errorDiv.classList.remove('hidden');
+    }
+  } else {
+    errorDiv.textContent = 'Please select login type';
+    errorDiv.classList.remove('hidden');
+  }
+}
+
+function handleLogout() {
+  currentUser = null;
+  selectedSubjects = [];
+  subjectScores = {};
+  affectiveRatings = {};
+  psychomotorRatings = {};
+  affectiveDomains.forEach(d => { affectiveRatings[d] = 5; });
+  psychomotorDomains.forEach(d => { psychomotorRatings[d] = 5; });
+  document.getElementById('loginContainer').style.display = 'flex';
+  document.getElementById('appContainer').classList.remove('active');
+  document.getElementById('userType').value = '';
+  document.getElementById('adminUsername').value = '';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('selectedArm').value = '';
+  document.getElementById('armPassword').value = '';
+  document.getElementById('adminFields').classList.add('hidden');
+  document.getElementById('formmasterFields').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('loginContainer').style.display = 'none';
+  document.getElementById('appContainer').classList.add('active');
+  document.getElementById('currentUserName').textContent = currentUser.name;
+  
+  const tabs = currentUser.type === 'admin' 
+    ? ['dashboard', 'arms', 'masters', 'school', 'assessment', 'view', 'compute', 'print']
+    : ['input', 'view'];
+  
+  const tabsContainer = document.getElementById('tabsContainer');
+  tabsContainer.innerHTML = '';
+  tabs.forEach((tab, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab';
+    if (idx === 0) btn.classList.add('active');
+    btn.textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+    btn.addEventListener('click', function() { 
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      showTab(tab); 
+    });
+    tabsContainer.appendChild(btn);
+  });
+  
+  showTab(tabs[0]);
+}
+
+function showTab(tabName) {
+  ['dashboard', 'arms', 'masters', 'school', 'assessment', 'input', 'compute', 'view', 'print'].forEach(t => {
+    document.getElementById(t + 'Tab').classList.add('hidden');
+  });
+  
+  document.getElementById(tabName + 'Tab').classList.remove('hidden');
+  
+  if (tabName === 'dashboard') renderDashboard();
+  else if (tabName === 'arms') renderArms();
+  else if (tabName === 'masters') renderMasters();
+  else if (tabName === 'school') renderSchool();
+  else if (tabName === 'assessment') renderAssessment();
+  else if (tabName === 'input') renderInput();
+  else if (tabName === 'compute') renderCompute();
+  else if (tabName === 'view') renderView();
+  else if (tabName === 'print') renderPrint();
+}
+
+function renderDashboard() {
+  const assigned = classArms.filter(a => a.formMaster).length;
+  document.getElementById('dashboardTab').innerHTML = `
+    <div class="grid grid-2">
+      <div class="card">
+        <div style="font-size: 28px; font-weight: bold; color: #667eea;">30</div>
+        <div style="color: #666; margin-top: 5px; font-size: 14px;">Class Arms</div>
+      </div>
+      <div class="card">
+        <div style="font-size: 28px; font-weight: bold; color: #667eea;">${formMasters.length}</div>
+        <div style="color: #666; margin-top: 5px; font-size: 14px;">Form Masters</div>
+      </div>
+      <div class="card">
+        <div style="font-size: 28px; font-weight: bold; color: #667eea;">${students.length}</div>
+        <div style="color: #666; margin-top: 5px; font-size: 14px;">Students</div>
+      </div>
+      <div class="card">
+        <div style="font-size: 28px; font-weight: bold; color: #667eea;">${assigned}</div>
+        <div style="color: #666; margin-top: 5px; font-size: 14px;">Assigned Arms</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderArms() {
+  let html = '<div class="card"><h2 style="margin-bottom: 20px;">Manage Class Arms</h2><div class="grid grid-3">';
+  
+  classArms.forEach(arm => {
+    html += `
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+        <h4 style="margin: 0 0 10px 0;">${arm.name}</h4>
+        <select id="arm-select-${arm.id}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-bottom: 10px;">
+          <option value="">Assign Form Master</option>
+          ${formMasters.map(fm => `<option value="${fm.name}" ${arm.formMaster === fm.name ? 'selected' : ''}>${fm.name}</option>`).join('')}
+        </select>
+        ${arm.formMaster ? `<p style="font-size: 12px; color: green; margin: 5px 0;">✓ ${arm.formMaster}</p>` : ''}
+        <button class="btn btn-primary edit-names-btn" data-arm-id="${arm.id}" style="width: 100%; font-size: 12px;">Edit Names</button>
+      </div>
+    `;
+  });
+  
+  html += '</div></div>';
+  document.getElementById('armsTab').innerHTML = html;
+  
+  classArms.forEach(arm => {
+    const sel = document.getElementById(`arm-select-${arm.id}`);
+    if (sel) {
+      sel.addEventListener('change', function() {
+        const fm = formMasters.find(f => f.name === this.value);
+        if (arm) {
+          arm.formMaster = this.value;
+          arm.formMasterEmail = fm?.email || '';
+          renderArms();
+        }
+      });
+    }
+  });
+  
+  document.querySelectorAll('.edit-names-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const armId = parseInt(this.getAttribute('data-arm-id'));
+      const arm = classArms.find(a => a.id === armId);
+      let html = `<div class="card"><h2>${arm.name} - Student Names (Password: ${arm.password})</h2><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-top: 20px;">`;
+      
+      arm.studentNames.forEach((name, idx) => {
+        html += `<input type="text" id="student-name-${idx}" value="${name}" placeholder="${idx + 1}." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">`;
+      });
+      
+      html += `</div><button class="btn btn-primary" id="backToArms" style="margin-top: 15px;">Back</button></div>`;
+      document.getElementById('armsTab').innerHTML = html;
+      
+      arm.studentNames.forEach((name, idx) => {
+        const inp = document.getElementById(`student-name-${idx}`);
+        if (inp) {
+          inp.addEventListener('change', function() {
+            arm.studentNames[idx] = this.value;
+          });
+        }
+      });
+      
+      document.getElementById('backToArms').addEventListener('click', renderArms);
+    });
+  });
+}
+
+function renderMasters() {
+  let html = `
+    <div class="card">
+      <h2>Form Masters</h2>
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin: 0 0 15px 0; font-size: 16px;">Add Form Master</h3>
+        <div class="grid grid-2">
+          <input type="text" id="newFmName" placeholder="Name" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+          <input type="email" id="newFmEmail" placeholder="Email" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+          <input type="password" id="newFmPassword" placeholder="Password" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <button class="btn btn-success" id="addFmBtn" style="margin-top: 10px;">Add</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Password</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+  `;
+  
+  formMasters.forEach(fm => {
+    const assigned = classArms.find(a => a.formMaster === fm.name);
+    html += `<tr><td>${fm.name}</td><td>${fm.email}</td><td>${fm.password}</td><td>${assigned ? '✓ ' + assigned.name : '⚠ Unassigned'}</td><td><button class="btn btn-danger delete-fm-btn" data-fm-id="${fm.id}">Delete</button></td></tr>`;
+  });
+  
+  html += '</tbody></table></div>';
+  document.getElementById('mastersTab').innerHTML = html;
+  
+  document.getElementById('addFmBtn').addEventListener('click', () => {
+    const name = document.getElementById('newFmName').value;
+    const email = document.getElementById('newFmEmail').value;
+    const password = document.getElementById('newFmPassword').value;
+    
+    if (!name || !email || !password) {
+      alert('Fill all fields');
+      return;
+    }
+    
+    formMasters.push({ id: Date.now(), name, email, password });
+    alert('Form Master added!');
+    renderMasters();
+  });
+  
+  document.querySelectorAll('.delete-fm-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (confirm('Delete this form master?')) {
+        formMasters = formMasters.filter(fm => fm.id !== parseInt(this.getAttribute('data-fm-id')));
+        renderMasters();
+      }
+    });
+  });
+}
+
+function renderSchool() {
+  document.getElementById('schoolTab').innerHTML = `
+    <div class="card">
+      <h2>School Information</h2>
+      <div class="grid grid-2" style="margin: 20px 0;">
+        <div class="input-group"><label>School Name</label><input type="text" id="schoolName" value="${schoolInfo.name}"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="schoolEmail" value="${schoolInfo.email}"></div>
+        <div class="input-group"><label>Phone</label><input type="text" id="schoolPhone" value="${schoolInfo.phone}"></div>
+        <div class="input-group"><label>Principal Name</label><input type="text" id="schoolPrincipal" value="${schoolInfo.principalName}"></div>
+        <div class="input-group"><label>Address</label><input type="text" id="schoolAddress" value="${schoolInfo.address}"></div>
+        <div class="input-group"><label>Session</label><input type="text" id="schoolSession" value="${schoolInfo.session}"></div>
+      </div>
+      
+      <h3 style="margin: 25px 0 15px;">Upload Images</h3>
+      <div class="grid grid-2">
+        <div class="input-group">
+          <label>School Logo</label>
+          <input type="file" id="schoolLogo" accept="image/*">
+          ${schoolInfo.logo ? '<p style="color: green; font-size: 12px; margin-top: 5px;">✓ Logo uploaded</p>' : ''}
+        </div>
+        <div class="input-group">
+          <label>Principal Signature</label>
+          <input type="file" id="principalSig" accept="image/*">
+          ${schoolInfo.principalSignature ? '<p style="color: green; font-size: 12px; margin-top: 5px;">✓ Signature uploaded</p>' : ''}
+        </div>
+      </div>
+      
+      <h3 style="margin: 25px 0 15px;">Teacher Signatures</h3>
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <div class="grid grid-2" style="margin-bottom: 10px;">
+          <select id="teacherSubject" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <option value="">Select Subject</option>
+            ${allSubjects.map(s => `<option value="${s}">${s}</option>`).join('')}
+          </select>
+          <input type="file" id="teacherSigFile" accept="image/*" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <button class="btn btn-success" id="uploadTeacherSig">Upload Teacher Signature</button>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <strong style="display: block; margin-bottom: 10px;">Uploaded Signatures:</strong>
+        ${Object.keys(teacherSignatures).length === 0 ? '<p style="color: #999;">No signatures uploaded yet</p>' : ''}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+          ${Object.keys(teacherSignatures).map(subject => `
+            <div style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+              <strong>${subject}</strong>
+              <button class="btn btn-danger remove-teacher-sig" data-subject="${subject}" style="margin-top: 5px; padding: 4px 8px; font-size: 11px;">Remove</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <button class="btn btn-primary" id="saveSchoolBtn">Save School Info</button>
+    </div>
+  `;
+  
+  document.getElementById('schoolLogo').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        schoolInfo.logo = ev.target.result;
+        alert('Logo uploaded!');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  document.getElementById('principalSig').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        schoolInfo.principalSignature = ev.target.result;
+        alert('Principal signature uploaded!');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  document.getElementById('uploadTeacherSig').addEventListener('click', () => {
+    const subject = document.getElementById('teacherSubject').value;
+    const file = document.getElementById('teacherSigFile').files[0];
+    
+    if (!subject || !file) {
+      alert('Select subject and file');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = ev => {
+      teacherSignatures[subject] = ev.target.result;
+      alert(`Signature for ${subject} uploaded!`);
+      renderSchool();
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  document.querySelectorAll('.remove-teacher-sig').forEach(btn => {
+    btn.addEventListener('click', function() {
+      delete teacherSignatures[this.getAttribute('data-subject')];
+      renderSchool();
+    });
+  });
+  
+  document.getElementById('saveSchoolBtn').addEventListener('click', () => {
+    schoolInfo.name = document.getElementById('schoolName').value;
+    schoolInfo.email = document.getElementById('schoolEmail').value;
+    schoolInfo.phone = document.getElementById('schoolPhone').value;
+    schoolInfo.principalName = document.getElementById('schoolPrincipal').value;
+    schoolInfo.address = document.getElementById('schoolAddress').value;
+    schoolInfo.session = document.getElementById('schoolSession').value;
+    alert('School info saved!');
+  });
+}
+
+function renderAssessment() {
+  let html = '<div class="card"><h2>Assessment Configuration</h2><p style="color: #666; margin-bottom: 20px;">Set continuous assessment and exam score distribution for each class</p>';
+  
+  const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+  
+  classes.forEach(cls => {
+    html += `<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+      <h3 style="margin: 0 0 15px 0; color: #667eea;">${cls} Classes</h3>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">`;
+    
+    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+      const className = cls + letter;
+      const config = assessmentConfig[className];
+      html += `
+        <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+          <strong style="display: block; margin-bottom: 10px; font-size: 13px;">${className}</strong>
+          <div style="font-size: 11px;">
+            <label style="display: block; margin: 5px 0;">CA1: <input type="number" id="ca1-${className}" value="${config.ca1}" min="0" max="30" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 3px;"></label>
+            <label style="display: block; margin: 5px 0;">CA2: <input type="number" id="ca2-${className}" value="${config.ca2}" min="0" max="30" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 3px;"></label>
+            <label style="display: block; margin: 5px 0;">CA3: <input type="number" id="ca3-${className}" value="${config.ca3}" min="0" max="30" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 3px;"></label>
+            <label style="display: block; margin: 5px 0;">Exam: <input type="number" id="exam-${className}" value="${config.exam}" min="0" max="100" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 3px;"></label>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div></div>';
+  });
+  
+  html += '<button class="btn btn-primary" id="saveAssessmentBtn">Save All Configurations</button></div>';
+  
+  document.getElementById('assessmentTab').innerHTML = html;
+  
+  document.getElementById('saveAssessmentBtn').addEventListener('click', () => {
+    try {
+      let hasError = false;
+      classArms.forEach(arm => {
+        const ca1Input = document.getElementById(`ca1-${arm.name}`);
+        const ca2Input = document.getElementById(`ca2-${arm.name}`);
+        const ca3Input = document.getElementById(`ca3-${arm.name}`);
+        const examInput = document.getElementById(`exam-${arm.name}`);
+        
+        if (!ca1Input || !ca2Input || !ca3Input || !examInput) {
+          hasError = true;
+          return;
+        }
+        
+        const ca1 = parseInt(ca1Input.value) || 0;
+        const ca2 = parseInt(ca2Input.value) || 0;
+        const ca3 = parseInt(ca3Input.value) || 0;
+        const exam = parseInt(examInput.value) || 0;
+        
+        const total = ca1 + ca2 + ca3 + exam;
+        
+        if (total !== 100) {
+          alert(`Error in ${arm.name}: Total must equal 100 (Currently: ${total})`);
+          hasError = true;
+          return;
+        }
+        
+        assessmentConfig[arm.name] = { ca1, ca2, ca3, exam };
+      });
+      
+      if (!hasError) {
+        alert('✓ Assessment configuration saved successfully!');
+        console.log('Saved Assessment Config:', assessmentConfig);
+      }
+    } catch (error) {
+      alert('Error saving configuration: ' + error.message);
+      console.error(error);
+    }
+  });
+}
+
+function renderInput() {
+  const arm = classArms.find(a => a.name === currentUser.arm);
+  const studentNames = arm?.studentNames.filter(n => n) || [];
+  const config = assessmentConfig[currentUser.arm];
+  
+  selectedSubjects = [];
+  subjectScores = {};
+  affectiveRatings = {};
+  psychomotorRatings = {};
+  affectiveDomains.forEach(d => { affectiveRatings[d] = 5; });
+  psychomotorDomains.forEach(d => { psychomotorRatings[d] = 5; });
+  
+  document.getElementById('inputTab').innerHTML = `
+    <div class="card">
+      <h2>${currentUser.arm} - Enter Results</h2>
+      <p style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin: 15px 0; font-size: 12px;">
+        <strong>Score Limits:</strong> CA1 (0-${config.ca1}), CA2 (0-${config.ca2}), CA3 (0-${config.ca3}), Exam (0-${config.exam})
+      </p>
+      
+      <div class="grid grid-2">
+        <div class="input-group">
+          <label>Student Name *</label>
+          <select id="studentName">
+            <option value="">Select</option>
+            ${studentNames.map(n => `<option value="${n}">${n}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Admission Number *</label>
+          <input type="text" id="admNo">
+        </div>
+        <div class="input-group">
+          <label>Date of Birth *</label>
+          <div class="dob-selectors">
+            <select id="dobDay">
+              <option value="">Day</option>
+              ${Array.from({length: 31}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+            </select>
+            <select id="dobMonth">
+              <option value="">Month</option>
+              <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+              <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+              <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+            </select>
+            <select id="dobYear">
+              <option value="">Year</option>
+              ${Array.from({length: 25}, (_, i) => `<option value="${2015-i}">${2015-i}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Age</label>
+          <input type="text" id="age" disabled style="background: #f0f0f0;">
+        </div>
+        <div class="input-group">
+          <label>Sex *</label>
+          <select id="sex">
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Term *</label>
+          <select id="term">
+            <option value="">Select</option>
+            <option value="1">Term 1</option>
+            <option value="2">Term 2</option>
+            <option value="3">Term 3</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Student Passport Photo</label>
+        <input type="file" id="studentPassport" accept="image/*">
+      </div>
+
+      <div class="input-group">
+        <label>Select Subjects</label>
+        <input type="text" id="subjectSearch" placeholder="Search subjects..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+        <div class="subject-selector" id="subjectList"></div>
+        <div class="selected-subjects" id="selectedSubjects"></div>
+      </div>
+
+      <div id="scoresSection" style="margin-top: 20px;">
+        <h3>Enter Scores</h3>
+        <div id="scoreInputs"></div>
+      </div>
+      
+      <h3 style="margin-top: 25px;">Affective Domain (5=Excellent, 1=Poor)</h3>
+      <div id="affectiveSection" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+      
+      <h3>Psychomotor Domain (5=Excellent, 1=Poor)</h3>
+      <div id="psychomotorSection" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+      
+      <div class="grid grid-2">
+        <div class="input-group">
+          <label>Form Master's Comment</label>
+          <textarea id="formMasterComment" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+        </div>
+        <div class="input-group">
+          <label>Form Master's Signature</label>
+          <input type="file" id="formMasterSig" accept="image/*">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-success" id="saveStudentBtn">Save Student</button>
+        <button class="btn btn-danger" id="clearFormBtn">Clear</button>
+      </div>
+    </div>
+  `;
+  
+  renderSubjectList();
+  renderAffective();
+  renderPsychomotor();
+  
+  document.getElementById('dobDay').addEventListener('change', calculateAge);
+  document.getElementById('dobMonth').addEventListener('change', calculateAge);
+  document.getElementById('dobYear').addEventListener('change', calculateAge);
+  document.getElementById('subjectSearch').addEventListener('input', renderSubjectList);
+  document.getElementById('saveStudentBtn').addEventListener('click', saveStudent);
+  document.getElementById('clearFormBtn').addEventListener('click', clearForm);
+}
+
+function calculateAge() {
+  const day = document.getElementById('dobDay').value;
+  const month = document.getElementById('dobMonth').value;
+  const year = document.getElementById('dobYear').value;
+  
+  if (day && month && year) {
+    const dob = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    document.getElementById('age').value = age;
+  }
+}
+
+function renderSubjectList() {
+  const search = document.getElementById('subjectSearch').value.toLowerCase();
+  const filtered = allSubjects.filter(s => s.toLowerCase().includes(search));
+  
+  const listDiv = document.getElementById('subjectList');
+  listDiv.innerHTML = '';
+  
+  filtered.forEach(subject => {
+    const div = document.createElement('div');
+    div.className = 'subject-item' + (selectedSubjects.includes(subject) ? ' selected' : '');
+    div.textContent = (selectedSubjects.includes(subject) ? '✓ ' : '') + subject;
+    div.addEventListener('click', () => toggleSubject(subject));
+    listDiv.appendChild(div);
+  });
+  
+  updateSelectedSubjects();
+}
+
+function toggleSubject(subject) {
+  if (selectedSubjects.includes(subject)) {
+    selectedSubjects = selectedSubjects.filter(s => s !== subject);
+    delete subjectScores[subject];
+  } else {
+    selectedSubjects.push(subject);
+    subjectScores[subject] = { ca1: 0, ca2: 0, ca3: 0, exam: 0 };
+  }
+  renderSubjectList();
+  renderScoreInputs();
+}
+
+function updateSelectedSubjects() {
+  const container = document.getElementById('selectedSubjects');
+  container.innerHTML = '';
+  
+  selectedSubjects.forEach(subject => {
+    const tag = document.createElement('div');
+    tag.className = 'subject-tag';
+    tag.innerHTML = `${subject} <span class="remove">×</span>`;
+    tag.querySelector('.remove').addEventListener('click', () => toggleSubject(subject));
+    container.appendChild(tag);
+  });
+}
+
+function renderScoreInputs() {
+  const container = document.getElementById('scoreInputs');
+  container.innerHTML = '';
+  
+  if (selectedSubjects.length === 0) {
+    container.innerHTML = '<p style="color: #999;">Select subjects to enter scores</p>';
+    return;
+  }
+  
+  const config = assessmentConfig[currentUser.arm];
+  
+  selectedSubjects.forEach(subject => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px;';
+    
+    const scores = subjectScores[subject];
+    const total = scores.ca1 + scores.ca2 + scores.ca3 + scores.exam;
+    let grade = 'F', remark = 'Failed';
+    if (total >= 80) { grade = 'A'; remark = 'Excellent'; }
+    else if (total >= 70) { grade = 'B'; remark = 'Very Good'; }
+    else if (total >= 60) { grade = 'C'; remark = 'Good'; }
+    else if (total >= 50) { grade = 'D'; remark = 'Pass'; }
+    
+    div.innerHTML = `
+      <strong style="font-size: 12px;">${subject}</strong>
+      <input type="number" class="score-input" placeholder="CA1" value="${scores.ca1 || ''}" 
+        data-subject="${subject}" data-field="ca1" min="0" max="${config.ca1}">
+      <input type="number" class="score-input" placeholder="CA2" value="${scores.ca2 || ''}" 
+        data-subject="${subject}" data-field="ca2" min="0" max="${config.ca2}">
+      <input type="number" class="score-input" placeholder="CA3" value="${scores.ca3 || ''}" 
+        data-subject="${subject}" data-field="ca3" min="0" max="${config.ca3}">
+      <input type="number" class="score-input" placeholder="Exam" value="${scores.exam || ''}" 
+        data-subject="${subject}" data-field="exam" min="0" max="${config.exam}">
+      <strong style="font-size: 12px;">${total}</strong>
+      <div style="font-size: 11px;"><strong>${grade}</strong><br>${remark}</div>
+    `;
+    
+    container.appendChild(div);
+  });
+  
+  document.querySelectorAll('.score-input').forEach(input => {
+    input.addEventListener('input', function() {
+      const subject = this.getAttribute('data-subject');
+      const field = this.getAttribute('data-field');
+      const value = parseFloat(this.value) || 0;
+      const max = parseFloat(this.getAttribute('max'));
+      
+      if (value > max) {
+        alert(`${field.toUpperCase()} cannot exceed ${max}`);
+        this.value = max;
+        subjectScores[subject][field] = max;
+      } else {
+        subjectScores[subject][field] = value;
+      }
+      renderScoreInputs();
+    });
+  });
+}
+
+function renderAffective() {
+  const container = document.getElementById('affectiveSection');
+  container.innerHTML = '';
+  
+  affectiveDomains.forEach(domain => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; margin-bottom: 8px; border-radius: 4px;';
+    
+    const label = document.createElement('span');
+    label.textContent = domain;
+    label.style.fontWeight = '600';
+    label.style.fontSize = '13px';
+    
+    const ratingDiv = document.createElement('div');
+    ratingDiv.className = 'rating-selector';
+    
+    [5, 4, 3, 2, 1].forEach(rating => {
+      const btn = document.createElement('button');
+      btn.className = 'rating-btn';
+      btn.textContent = rating;
+      if (affectiveRatings[domain] === rating) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        affectiveRatings[domain] = rating;
+        renderAffective();
+      });
+      ratingDiv.appendChild(btn);
+    });
+    
+    div.appendChild(label);
+    div.appendChild(ratingDiv);
+    container.appendChild(div);
+  });
+}
+
+function renderPsychomotor() {
+  const container = document.getElementById('psychomotorSection');
+  container.innerHTML = '';
+  
+  psychomotorDomains.forEach(domain => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; margin-bottom: 8px; border-radius: 4px;';
+    
+    const label = document.createElement('span');
+    label.textContent = domain;
+    label.style.fontWeight = '600';
+    label.style.fontSize = '13px';
+    
+    const ratingDiv = document.createElement('div');
+    ratingDiv.className = 'rating-selector';
+    
+    [5, 4, 3, 2, 1].forEach(rating => {
+      const btn = document.createElement('button');
+      btn.className = 'rating-btn';
+      btn.textContent = rating;
+      if (psychomotorRatings[domain] === rating) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        psychomotorRatings[domain] = rating;
+        renderPsychomotor();
+      });
+      ratingDiv.appendChild(btn);
+    });
+    
+    div.appendChild(label);
+    div.appendChild(ratingDiv);
+    container.appendChild(div);
+  });
+}
+
+function saveStudent() {
+  const studentName = document.getElementById('studentName').value;
+  const admNo = document.getElementById('admNo').value;
+  const dob = `${document.getElementById('dobDay').value}/${document.getElementById('dobMonth').value}/${document.getElementById('dobYear').value}`;
+  const age = document.getElementById('age').value;
+  const sex = document.getElementById('sex').value;
+  const term = document.getElementById('term').value;
+  const formMasterComment = document.getElementById('formMasterComment').value;
+  
+  if (!studentName || !admNo || !age || !sex || !term) {
+    alert('Fill all required fields');
+    return;
+  }
+  
+  if (selectedSubjects.length === 0) {
+    alert('Select at least one subject');
+    return;
+  }
+  
+  const passportFile = document.getElementById('studentPassport').files[0];
+  const formMasterSigFile = document.getElementById('formMasterSig').files[0];
+  
+  const processStudent = (passportData, formMasterSigData) => {
+    let totalScore = 0;
+    let totalObtainable = 0;
+    const subjects = [];
+    
+    selectedSubjects.forEach(subject => {
+      const scores = subjectScores[subject];
+      const total = scores.ca1 + scores.ca2 + scores.ca3 + scores.exam;
+      totalScore += total;
+      totalObtainable += 100;
+      
+      let grade = 'F', remark = 'Failed';
+      if (total >= 80) { grade = 'A'; remark = 'Excellent'; }
+      else if (total >= 70) { grade = 'B'; remark = 'Very Good'; }
+      else if (total >= 60) { grade = 'C'; remark = 'Good'; }
+      else if (total >= 50) { grade = 'D'; remark = 'Pass'; }
+      
+      subjects.push({
+        name: subject,
+        ca1: scores.ca1,
+        ca2: scores.ca2,
+        ca3: scores.ca3,
+        exam: scores.exam,
+        total: total,
+        grade: grade,
+        remark: remark
+      });
+    });
+    
+    const avgScore = (totalScore / totalObtainable) * 100;
+    const arm = classArms.find(a => a.name === currentUser.arm);
+    
+    const newStudent = {
+      id: Date.now(),
+      studentName,
+      admNo,
+      dob,
+      age,
+      sex,
+      term,
+      className: currentUser.arm,
+      subjects,
+      averageScore: avgScore,
+      totalObtained: totalScore,
+      totalObtainable: totalObtainable,
+      position: null,
+      positionOf: null,
+      passport: passportData,
+      formMaster: arm?.formMaster || currentUser.name,
+      formMasterComment: formMasterComment,
+      formMasterSignature: formMasterSigData,
+      affective: {...affectiveRatings},
+      psychomotor: {...psychomotorRatings}
+    };
+    
+    students.push(newStudent);
+    alert('Student saved successfully!');
+    clearForm();
+  };
+  
+  if (passportFile || formMasterSigFile) {
+    let passportData = null;
+    let formMasterSigData = null;
+    let filesRead = 0;
+    const totalFiles = (passportFile ? 1 : 0) + (formMasterSigFile ? 1 : 0);
+    
+    if (passportFile) {
+      const reader1 = new FileReader();
+      reader1.onload = e => {
+        passportData = e.target.result;
+        filesRead++;
+        if (filesRead === totalFiles) processStudent(passportData, formMasterSigData);
+      };
+      reader1.readAsDataURL(passportFile);
+    }
+    
+    if (formMasterSigFile) {
+      const reader2 = new FileReader();
+      reader2.onload = e => {
+        formMasterSigData = e.target.result;
+        filesRead++;
+        if (filesRead === totalFiles) processStudent(passportData, formMasterSigData);
+      };
+      reader2.readAsDataURL(formMasterSigFile);
+    }
+  } else {
+    processStudent(null, null);
+  }
+}
+
+function clearForm() {
+  document.getElementById('studentName').value = '';
+  document.getElementById('admNo').value = '';
+  document.getElementById('dobDay').value = '';
+  document.getElementById('dobMonth').value = '';
+  document.getElementById('dobYear').value = '';
+  document.getElementById('age').value = '';
+  document.getElementById('sex').value = '';
+  document.getElementById('term').value = '';
+  document.getElementById('formMasterComment').value = '';
+  selectedSubjects = [];
+  subjectScores = {};
+  affectiveRatings = {};
+  psychomotorRatings = {};
+  affectiveDomains.forEach(d => { affectiveRatings[d] = 5; });
+  psychomotorDomains.forEach(d => { psychomotorRatings[d] = 5; });
+  renderSubjectList();
+  renderScoreInputs();
+  renderAffective();
+  renderPsychomotor();
+}
+
+function renderCompute() {
+  document.getElementById('computeTab').innerHTML = `
+    <div class="card" style="text-align: center; padding: 40px;">
+      <h2>Compute Results</h2>
+      <p style="color: #666; margin-bottom: 20px;">Calculate positions for all students by class and term</p>
+      <button class="btn btn-primary" id="computeBtn" style="padding: 10px 30px; font-size: 15px;">Compute Positions</button>
+    </div>
+  `;
+  
+  document.getElementById('computeBtn').addEventListener('click', () => {
+    const grouped = {};
+    
+    students.forEach(s => {
+      const key = s.className + '-' + s.term;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(s);
+    });
+    
+    Object.keys(grouped).forEach(key => {
+      const sorted = grouped[key].sort((a, b) => b.averageScore - a.averageScore);
+      sorted.forEach((s, i) => {
+        s.position = i + 1;
+        s.positionOf = sorted.length;
+      });
+    });
+    
+    alert('Results computed successfully!');
+  });
+}
+
+function renderView() {
+  const userStudents = currentUser.type === 'admin' ? students : students.filter(s => s.className === currentUser.arm);
+  
+  let html = '<div class="card"><h2>View Students</h2>';
+  
+  if (userStudents.length === 0) {
+    html += '<p style="color: #999; text-align: center; padding: 40px;">No students found</p></div>';
+  } else {
+    html += `<table><thead><tr><th>Name</th><th>Adm No</th><th>Class</th><th>Term</th><th>Subjects</th><th>Avg</th><th>Position</th></tr></thead><tbody>`;
+    
+    userStudents.forEach(s => {
+      html += `<tr><td>${s.studentName}</td><td>${s.admNo}</td><td>${s.className}</td><td>${s.term}</td><td>${s.subjects.length}</td><td>${s.averageScore.toFixed(1)}%</td><td>${s.position || '-'}/${s.positionOf || '-'}</td></tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+  }
+  
+  document.getElementById('viewTab').innerHTML = html;
+}
+
+function renderPrint() {
+  const grouped = {};
+  students.forEach(s => {
+    const key = `${s.className} - Term ${s.term}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(s);
+  });
+  
+  let html = '<div class="card"><h2>Print Student Results</h2><p style="color: #666; margin-bottom: 20px;">Select class and term to print results</p>';
+  
+  if (Object.keys(grouped).length === 0) {
+    html += '<p style="color: #999;">No computed results available</p></div>';
+  } else {
+    Object.keys(grouped).forEach(key => {
+      const studentList = grouped[key];
+      const [className, term] = key.split(' - ');
+      
+      html += `
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0;">${key} (${studentList.length} students)</h3>
+            <button class="btn btn-primary print-all-btn" data-class="${className.trim()}" data-term="${term.replace('Term ', '')}" style="padding: 10px 20px;">
+              Print All Results
+            </button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+            ${studentList.map(s => `
+              <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #ddd;">
+                <h4 style="margin: 0 0 8px 0; font-size: 14px;">${s.studentName}</h4>
+                <p style="margin: 3px 0; font-size: 12px; color: #666;">Adm: ${s.admNo}</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #666;">Avg: ${s.averageScore.toFixed(1)}%</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #666;">Position: ${s.position || '-'}/${s.positionOf || '-'}</p>
+                <button class="btn btn-success print-single-btn" data-student-id="${s.id}" style="width: 100%; margin-top: 8px; font-size: 12px; padding: 6px;">
+                  Print Result
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+  }
+  
+  document.getElementById('printTab').innerHTML = html;
+  
+  document.querySelectorAll('.print-single-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      printStudentResult(parseInt(this.getAttribute('data-student-id')));
+    });
+  });
+  
+  document.querySelectorAll('.print-all-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const className = this.getAttribute('data-class');
+      const term = this.getAttribute('data-term');
+      const studentsToPrint = students.filter(s => s.className === className && s.term === term);
+      
+      if (studentsToPrint.length === 0) {
+        alert('No students found');
+        return;
+      }
+      
+      if (!confirm(`Open ${studentsToPrint.length} result sheets?`)) return;
+      
+      studentsToPrint.forEach((student, idx) => {
+        setTimeout(() => printStudentResult(student.id), idx * 500);
+      });
+      
+      alert(`Opening ${studentsToPrint.length} result sheets...`);
+    });
+  });
+}
+
+function printStudentResult(studentId) {
+  const student = students.find(s => s.id === studentId);
+  if (!student) {
+    alert('Student not found');
+    return;
+  }
+  
+  const classStudents = students.filter(s => s.className === student.className && s.term === student.term);
+  const subjectStats = {};
+  
+  student.subjects.forEach(subject => {
+    const subjectScores = classStudents
+      .map(s => s.subjects.find(sub => sub.name === subject.name))
+      .filter(sub => sub)
+      .map(sub => sub.total);
+    
+    if (subjectScores.length > 0) {
+      const sum = subjectScores.reduce((a, b) => a + b, 0);
+      subjectStats[subject.name] = {
+        average: (sum / subjectScores.length).toFixed(1),
+        highest: Math.max(...subjectScores),
+        lowest: Math.min(...subjectScores)
+      };
+    } else {
+      subjectStats[subject.name] = { average: 0, highest: 0, lowest: 0 };
+    }
+  });
+  
+  const config = assessmentConfig[student.className];
+  const printWindow = window.open('', '_blank');
+  
+  const resultHTML = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${student.studentName} - Result Sheet</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { size: A4; margin: 10mm; }
+        body { font-family: Arial, sans-serif; padding: 10px; background: white; font-size: 10px; }
+        .result-sheet { max-width: 210mm; margin: 0 auto; border: 2px solid #333; padding: 15px; }
+        .header { display: grid; grid-template-columns: 80px 1fr 80px; gap: 10px; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 12px; }
+        .logo, .passport { width: 80px; height: 80px; object-fit: contain; border: 1px solid #ddd; }
+        .passport { height: 100px; object-fit: cover; border: 2px solid #333; }
+        .header-center { text-align: center; }
+        .school-name { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 3px; }
+        .school-info { font-size: 9px; color: #666; margin-bottom: 2px; }
+        .result-title { font-size: 14px; font-weight: bold; margin-top: 5px; color: #667eea; }
+        .student-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; padding: 8px; background: #f9f9f9; border-radius: 4px; font-size: 9px; }
+        .info-item { font-size: 9px; }
+        .info-label { font-weight: bold; color: #333; }
+        .info-value { color: #666; }
+        .results-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 8px; }
+        .results-table th, .results-table td { border: 1px solid #333; padding: 3px 2px; text-align: center; }
+        .results-table th { background: #667eea; color: white; font-weight: bold; font-size: 7px; }
+        .results-table td:first-child { text-align: left; font-weight: bold; font-size: 8px; }
+        .teacher-sig { max-width: 40px; max-height: 20px; object-fit: contain; }
+        .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+        .summary-item { text-align: center; padding: 8px; background: #f0f0f0; border-radius: 4px; }
+        .summary-label { font-size: 8px; color: #666; margin-bottom: 3px; }
+        .summary-value { font-size: 16px; font-weight: bold; color: #667eea; }
+        .grading-scale { font-size: 7px; margin-bottom: 8px; padding: 5px; background: #f9f9f9; border-radius: 4px; }
+        .domains-section { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .domain-box { border: 1px solid #333; padding: 8px; border-radius: 4px; }
+        .domain-title { font-size: 9px; font-weight: bold; margin-bottom: 5px; color: #667eea; }
+        .domain-table { width: 100%; font-size: 8px; }
+        .domain-table td { padding: 2px 5px; border-bottom: 1px solid #eee; }
+        .comments-section { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+        .comment-box { border: 1px solid #333; padding: 8px; border-radius: 4px; }
+        .comment-title { font-size: 9px; font-weight: bold; margin-bottom: 4px; color: #667eea; }
+        .comment-text { font-size: 8px; color: #333; min-height: 30px; margin-bottom: 5px; }
+        .signature-img { max-width: 60px; max-height: 30px; object-fit: contain; margin-top: 3px; }
+        .signature-line { border-top: 1px solid #333; margin-top: 5px; padding-top: 2px; font-size: 8px; text-align: center; }
+        @media print {
+          body { padding: 0; }
+          .no-print { display: none; }
+        }
+        .print-button { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 1000; }
+        .print-button:hover { background: #5568d3; }
+      </style>
+    </head>
+    <body>
+      <button class="print-button no-print" onclick="window.print()">🖨️ Print Result</button>
+      
+      <div class="result-sheet">
+        <div class="header">
+          ${schoolInfo.logo ? `<img src="${schoolInfo.logo}" alt="Logo" class="logo">` : '<div class="logo" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #999;">No Logo</div>'}
+          <div class="header-center">
+            <div class="school-name">${schoolInfo.name}</div>
+            <div class="school-info">${schoolInfo.address}</div>
+            <div class="school-info">📧 ${schoolInfo.email} | 📞 ${schoolInfo.phone}</div>
+            <div class="result-title">STUDENT RESULT SHEET</div>
+            <div class="school-info" style="margin-top: 3px;">Academic Session: ${schoolInfo.session} | Term ${student.term}</div>
+          </div>
+          ${student.passport ? `<img src="${student.passport}" alt="Passport" class="passport">` : '<div class="passport" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #999; text-align: center;">No Photo</div>'}
+        </div>
+        
+        <div class="student-info">
+          <div class="info-item"><span class="info-label">Student Name:</span> <span class="info-value">${student.studentName}</span></div>
+          <div class="info-item"><span class="info-label">Admission No:</span> <span class="info-value">${student.admNo}</span></div>
+          <div class="info-item"><span class="info-label">Class:</span> <span class="info-value">${student.className}</span></div>
+          <div class="info-item"><span class="info-label">Sex:</span> <span class="info-value">${student.sex}</span></div>
+          <div class="info-item"><span class="info-label">Date of Birth:</span> <span class="info-value">${student.dob}</span></div>
+          <div class="info-item"><span class="info-label">Age:</span> <span class="info-value">${student.age} years</span></div>
+        </div>
+        
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th rowspan="2">SUBJECT</th>
+              <th>CA1<br>(${config.ca1})</th>
+              <th>CA2<br>(${config.ca2})</th>
+              <th>CA3<br>(${config.ca3})</th>
+              <th>Total<br>CA</th>
+              <th>Exam<br>(${config.exam})</th>
+              <th>Total<br>(100)</th>
+              <th>Grade</th>
+              <th>Remark</th>
+              <th>Class<br>Avg</th>
+              <th>High</th>
+              <th>Low</th>
+              <th>Teacher<br>Sign</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${student.subjects.map(sub => {
+              const stats = subjectStats[sub.name];
+              const caTotal = sub.ca1 + sub.ca2 + sub.ca3;
+              return `
+              <tr>
+                <td>${sub.name}</td>
+                <td>${sub.ca1}</td>
+                <td>${sub.ca2}</td>
+                <td>${sub.ca3}</td>
+                <td><strong>${caTotal}</strong></td>
+                <td>${sub.exam}</td>
+                <td><strong>${sub.total}</strong></td>
+                <td><strong>${sub.grade}</strong></td>
+                <td style="font-size: 7px;">${sub.remark}</td>
+                <td>${stats.average}</td>
+                <td>${stats.highest}</td>
+                <td>${stats.lowest}</td>
+                <td>${teacherSignatures[sub.name] ? `<img src="${teacherSignatures[sub.name]}" class="teacher-sig">` : '-'}</td>
+              </tr>
+            `}).join('')}
+          </tbody>
+        </table>
+        
+        <div class="summary">
+          <div class="summary-item">
+            <div class="summary-label">Total Subjects</div>
+            <div class="summary-value">${student.subjects.length}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Total Obtainable</div>
+            <div class="summary-value">${student.totalObtainable}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Total Obtained</div>
+            <div class="summary-value">${student.totalObtained}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Average</div>
+            <div class="summary-value">${student.averageScore.toFixed(1)}%</div>
+          </div>
+        </div>
+        
+        ${student.position ? `
+          <div style="text-align: center; padding: 6px; background: #e3f2fd; border-radius: 4px; margin-bottom: 8px;">
+            <strong style="font-size: 11px; color: #1976d2;">Position: ${student.position} of ${student.positionOf}</strong>
+          </div>
+        ` : ''}
+        
+        <div class="grading-scale">
+          <strong>Grading Scale:</strong> A (80-100) Excellent | B (70-79) Very Good | C (60-69) Good | D (50-59) Pass | F (0-49) Failed
+        </div>
+        
+        <div class="domains-section">
+          <div class="domain-box">
+            <div class="domain-title">AFFECTIVE DOMAIN</div>
+            <table class="domain-table">
+              ${affectiveDomains.map(domain => `
+                <tr>
+                  <td style="text-align: left;">${domain}</td>
+                  <td style="text-align: right; font-weight: bold;">${student.affective[domain]}/5</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
+          <div class="domain-box">
+            <div class="domain-title">PSYCHOMOTOR DOMAIN</div>
+            <table class="domain-table">
+              ${psychomotorDomains.map(domain => `
+                <tr>
+                  <td style="text-align: left;">${domain}</td>
+                  <td style="text-align: right; font-weight: bold;">${student.psychomotor[domain]}/5</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
+        </div>
+        
+        <div class="comments-section">
+          <div class="comment-box">
+            <div class="comment-title">Form Master's Comment:</div>
+            <div class="comment-text">${student.formMasterComment || 'No comment provided'}</div>
+            ${student.formMasterSignature ? `<img src="${student.formMasterSignature}" class="signature-img">` : ''}
+            <div class="signature-line">${student.formMaster || 'Form Master'}</div>
+          </div>
+          <div class="comment-box">
+            <div class="comment-title">Principal's Comment:</div>
+            <div class="comment-text">${schoolInfo.principalComment || 'Approved'}</div>
+            ${schoolInfo.principalSignature ? `<img src="${schoolInfo.principalSignature}" class="signature-img">` : ''}
+            <div class="signature-line">${schoolInfo.principalName}</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; font-size: 8px; color: #666; margin-top: 8px; padding-top: 6px; border-top: 1px solid #ccc;">
+          Generated on ${new Date().toLocaleDateString()} | Rating Scale: 5=Excellent, 4=Very Good, 3=Good, 2=Fair, 1=Poor
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  printWindow.document.write(resultHTML);
+  printWindow.document.close();
+}
+</script>
+</body>
+</html>
